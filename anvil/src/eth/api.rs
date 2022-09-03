@@ -803,6 +803,16 @@ impl EthApi {
             self.backend.call(request, fees, Some(block_request), overrides).await?;
         trace!(target = "node", "Call status {:?}, gas {}", exit, gas);
 
+        let gas = bytes::Bytes::from(gas.to_be_bytes().to_vec());
+
+        let out = match out {
+            TransactOut::None => todo!(),
+            TransactOut::Call(b) => b,
+            TransactOut::Create(_, _) => todo!(),
+        };
+        
+        let out = TransactOut::Call([out,gas].concat().into());
+
         ensure_return_ok(exit, &out)
     }
 
